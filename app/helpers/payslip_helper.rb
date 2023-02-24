@@ -1,4 +1,4 @@
-module TaxBracketHelper
+module PayslipHelper
 
   def get_tax_information
   @tax_bracket = {
@@ -9,5 +9,14 @@ module TaxBracketHelper
   180001.. => { id: 5, fee:40 , start: 180000 , end: ""}
   }
   return @tax_bracket
+  end
+
+
+  def update_employee_details(employee_name, income, monthly_income_tax, net_monthly_income)
+  	@employee_payslip = EmployeePayslip.new
+  	@employee_payslip.name = employee_name
+  	@employee_payslip.annual_salary = income
+  	@employee_payslip.monthly_income_tax = monthly_income_tax
+  	@employee_payslip.save
   end
 end
