@@ -9,7 +9,7 @@ Rails.application.routes.draw do
   #   post :import, on: :collection
   # end
 
-  get '/payslips', to: 'payslips#index'
+  get '/payslip_details', to: 'payslip#show_payslip_information'
   post '/payslip', to: 'payslip#get_payslip_information'
   get '/payslips/multiple', to: 'payslips#show_multiple'
 end
