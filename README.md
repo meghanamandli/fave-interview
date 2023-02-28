@@ -1,24 +1,13 @@
 # README
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+This is an ruby web application built on rails that computes monthly payslip for an employee based on his annual salary.
 
-Things you may want to cover:
+The following images shows the result of the REST API's created to post and get the payslip information.
 
-* Ruby version
 
-* System dependencies
 
-* Configuration
 
-* Database creation
+![image](https://user-images.githubusercontent.com/14215557/221846542-e2de6ff2-e1f3-43d2-9524-7224d6789438.png)
 
-* Database initialization
+![image](https://user-images.githubusercontent.com/14215557/221846809-0ff6b46c-8249-4270-8040-57ec14c5bfbb.png)
 
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
