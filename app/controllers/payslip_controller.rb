@@ -60,7 +60,6 @@ class PayslipController < ApplicationController
   def perform_payslip_operation
     generate_monthly_payslip(@name, @income)
     view_context.update_employee_details(@name, @income, @monthly_income_tax)
-    binding.pry
     EmployeePayslipMailer.send_email(@name, @income, @monthly_income_tax, @net_monthly_income).deliver_now
   end
 
@@ -69,7 +68,6 @@ class PayslipController < ApplicationController
     @employee_payslip.each do |payslip|
       @salary_computations.append(view_context.get_salary_data(payslip))
     end
-    binding.pry
     view_context.generate_csv(@salary_computations)
     render :json => @salary_computations
   end

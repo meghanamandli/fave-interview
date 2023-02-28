@@ -42,7 +42,6 @@ module PayslipHelper
   end
 
   def generate_csv(payslip_values)
-    binding.pry
     require 'csv'
     file = "#{Rails.root}/public/product_data.csv"
     CSV.open(file, 'w', write_headers: true, headers: headers) do |writer|
