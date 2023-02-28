@@ -2,13 +2,26 @@ class PayslipController < ApplicationController
 
   skip_before_action :verify_authenticity_token
   include PayslipHelper
+  require 'csv'
 
 
-  def get_payslip_information
-  	@name = params[:name]
-  	@income = params[:income].to_i
-  	generate_monthly_payslip(@name, @income)
-  	view_context.update_employee_details(@name, @income, @monthly_income_tax, @net_monthly_income)
+  def create_payslip
+    if params[:name].present? && params[:income].present?
+  	  @name = params[:name]
+  	  @income = params[:income].to_i
+      perform_payslip_operation
+    else
+      render :json => {error: "Please enter name and income"}
+    end
+  end
+
+  def show_payslip
+  	if params[:name].present?
+  		@employee_payslip = EmployeePayslip.where(name: params[:name])
+      show_pay_information
+  	else
+      render :json => {error: "Please enter name"}
+    end
   end
 
   def generate_monthly_payslip(name, income)
@@ -30,36 +43,34 @@ class PayslipController < ApplicationController
 
 
   def get_formatted_value(tax, name, income)
-  	@monthly_income_tax = @tax.to_f/12.00
-  	@monthly_income = @income.to_f/12.00
-  	@net_monthly_income = @monthly_income - @monthly_income_tax
-  	if params.present?
-    payslip_data = {"employee_name" => name, "gross_monthly_income" => @monthly_income, "monthly_income_tax" => @monthly_income_tax, "net_monthly_income" => @net_monthly_income}
+    @monthly_income_tax = @tax.to_f/12.00
+    @monthly_income = @income.to_f/12.00
+    @net_monthly_income = @monthly_income - @monthly_income_tax
+    if params.present?
+    payslip_data = {"employee_name" => name, "gross_monthly_income" => @monthly_income.to_f.round(2), "monthly_income_tax" => @monthly_income_tax.to_f.round(2), "net_monthly_income" => @net_monthly_income.to_f.round(2)}
     render :json => payslip_data
-  	else
-  	payslip_data = {"Monthly Payslip for" => name, "Gross Monthly Income:" => @imonthly_income, "Monthly Income Tax:" => @monthly_income_tax, "Net Monthly Income:" => @net_monthly_income}
-  	return :json => payslip_data
-  	end
+    else
+    payslip_data = {"Monthly Payslip for" => name, "Gross Monthly Income:" => @imonthly_income, "Monthly Income Tax:" => @monthly_income_tax, "Net Monthly Income:" => @net_monthly_income}
+    return :json => payslip_data
+    end
   end
 
+  private
 
-  def show_payslip_information
-  	if params[:name].present?
-  		@employee_payslip = EmployeePayslip.where(name: params[:name])
-  		@salary_computations = []
-  		@employee_payslip.each do |payslip|
-  		@salary_computations.append(get_salary_data(payslip))
-  		end
-  		render :json => @salary_computations
-  	end
+  def perform_payslip_operation
+    generate_monthly_payslip(@name, @income)
+    view_context.update_employee_details(@name, @income, @monthly_income_tax)
+    binding.pry
+    EmployeePayslipMailer.send_email(@name, @income, @monthly_income_tax, @net_monthly_income).deliver_now
   end
 
-  def get_salary_data(employee_payslip)
-  	{
-      time_stamp: employee_payslip.created_at,
-      employee_name: employee_payslip.name,
-      annual_salary: employee_payslip.annual_salary.to_f,
-      monthly_income_tax: employee_payslip.monthly_income_tax.to_f
-    }
+  def show_pay_information
+    @salary_computations = []
+    @employee_payslip.each do |payslip|
+      @salary_computations.append(view_context.get_salary_data(payslip))
+    end
+    binding.pry
+    view_context.generate_csv(@salary_computations)
+    render :json => @salary_computations
   end
 end
