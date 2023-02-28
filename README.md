@@ -1,6 +1,6 @@
 # README
 
-This is an ruby web application built on rails that computes monthly payslip for an employee based on his annual salary.
+This is a ruby web application built on rails that computes monthly payslip for an employee based on his annual salary.
 
 The following images shows the result of the REST API's created to post and get the payslip information.
 
